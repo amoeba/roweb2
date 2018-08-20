@@ -50,7 +50,7 @@ Potential outline:
 
 ## The post body (remove this header prior to publicatoin)
 
-As researchers, we generate and consume data all the time.
+As scientists, we generate and consume data all the time.
 But data, all by itself, often lacks enough information for us to answer questions such as:
 
 - How do I cite the data?
@@ -60,10 +60,10 @@ But data, all by itself, often lacks enough information for us to answer questio
 
 A common approach to documenting the information we need to answer these questions is to generate a metadata record that sits alongside the data.
 Very often, this metadata record is an XML file that follows a metadata standard that lets us describe a ton of information about our data.
-These XML metadata records are great in their expressiveness and useful for computers but suffer a few common problems:
+These XML metadata records are great in their expressiveness and useful for computers but suffer a few drawbacks:
 
-- Creating or editing these XML files by hand is confusing and error-prone and tools for working with them may not exist or are difficult to use
-- Using these standards is like learning a new language which is a large task for someone just trying to document their data
+- Creating or editing these XML files by hand is confusing and error-prone and tools for working with them may not exist or are difficult to use.
+- Using these standards is like learning a new language which is a large task for someone just trying to document their data.
 
 Stemming from a [discussion](https://github.com/ropensci/unconf18/issues/72) started by [Anna Krystalli](https://github.com/annakrystalli) as part of the [2018 rOpenSci Unconf](http://unconf18.ropensci.org) that there should be a way to create a minimal amount of useful metadata that both adheres to standards but is intuitively easy to use and widely applicable, we decided to test an idea to address these issues.
 
@@ -71,12 +71,67 @@ Enter [`dataspice`](https://github.com/ropenscilabs/dataspice).
 
 `dataspice` takes your raw data, and creates the spice on top of it, the metadata, which is so important for communicating with yourself in the future, as well as any others who may want to use your data. `dataspice` creates template metadata files based on your data, provides easy to use functions and even Shiny apps to help you guide you to filling them in. Once filled in, the templates can be used to:
 
-- Make a simple website (like [pkgdown](https://github.com/r-lib/pkgdown) but for your data) that you can easily host on [GitHub Pages](https://pages.github.com)
+- Make a simple website for you data (like [pkgdown](https://github.com/r-lib/pkgdown) does for R packages) that you can easily host on [GitHub Pages](https://pages.github.com) or elsewhere.
 - Generate a [JSON-LD](https://json-ld.org) record that Google and others understand which you can embed in a website (including the one `dataspice` makes for you).
 
 Our hope is to make creating metadata more accessible to everyone!
 
-To address the problem of existing metadata standards providing such a vast language, we started looking into Google's specification of a [Dataset](https://developers.google.com/search/docs/data-types/dataset), which would be a lowest common denominator of metadata that could support search and discovery of datasets regardless of what they are about or what repository they end up in (if any!). Google adopts their definition from [schema.org](http://schema.org/Dataset) and recommends a minimal number of those properties that should describe a dataset, such as a title, description, keywords, variable measured, and spatial and temporal coverage. But because even Google doesn't have a bounded definition of what a dataset is, it seems like the only required detail is identifying the "@type" property as a dataset, and providing a name. So, at the minimum, our package would need to produce a [json-ld](https://json-ld.org/) file that looks something like this:
+But what metadata do we help the user collect without being intimidating and also collecting enough information so the metadata is useful?
+We started by looking into Google's specification of a [Dataset](https://developers.google.com/search/docs/data-types/dataset), which would be a lowest common denominator of metadata that could support search and discovery of datasets regardless of what they are about or what repository they end up in (if any!). Google adopts their definition from [schema.org](http://schema.org/Dataset) and recommends a minimal number of those properties that should describe a dataset, such as a title, description, keywords, variable measured, and spatial and temporal coverage.
+
+## Getting started
+
+To get started with [dataspice](https://github.com/ropenscilabs/dataspice), create a new folder (and an [RStudio Project](https://www.tidyverse.org/articles/2017/12/workflow-vs-script/) perhaps) with a `data` subfolder:
+
+```
+.
+├── data
+│   ├── BroodTables.csv
+│   ├── SourceInfo.csv
+│   ├── StockInfo.csv
+├── salmon-data.Rproj
+└── README.md
+```
+
+Then just run:
+
+```r
+library(dataspice)
+
+create_spice()
+```
+
+And you should see that `dataspice` has created four CSV files in the `data/metadata` folder for you to fill in.
+```
+.
+├── data
+│   ├── BroodTables.csv
+│   ├── SourceInfo.csv
+│   ├── StockInfo.csv
+│   └── metadata
+│       ├── access.csv
+│       ├── attributes.csv
+│       ├── biblio.csv
+│       └── creators.csv
+├── salmon-data.Rproj
+└── README.md
+```
+
+Fill in these four CSV files with your favorite text editor or spreadsheet tool and run:
+
+```r
+write_spice()
+```
+
+Optionally, if you want `dataspice` to build you a web page, run
+
+```
+build_site()
+```
+
+* * * * *
+
+But because even Google doesn't have a bounded definition of what a dataset is, it seems like the only required detail is identifying the "@type" property as a dataset, and providing a name. So, at the minimum, our package would need to produce a [JSON-LD](https://json-ld.org/) file that looks something like this:
 
 ```json
 <script type="application/ld+json">
